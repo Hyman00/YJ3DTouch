@@ -1,2 +1,4 @@
 # YJ3DTouch
-Very easy adaptation of 3D Touch.
+Adapt very easily to 3D Touch.
+
+![image](https://github.com/Hyman00/YJ3DTouch/blob/master/tip.gif)
