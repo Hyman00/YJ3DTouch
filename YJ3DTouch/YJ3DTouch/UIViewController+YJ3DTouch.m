@@ -293,7 +293,7 @@
         return NO;
     }
     
-    return self.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable;
+    return [UIApplication sharedApplication].keyWindow.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable;
 }
 
 - (UIView *)yj3d_private_currentPreviewingView {
