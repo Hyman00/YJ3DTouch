@@ -10,22 +10,21 @@
 
 @implementation YJ3DTouchUtil
 
-+ (void)safeSwizzleOriginMethod:(SEL)origSel withTargetMethod:(SEL)altSel forObject:(NSObject *)obj {
-    if ([self hasSwizzledForTarget:obj swizzleSelector:origSel]) {
++ (void)safeSwizzleOriginMethod:(SEL)origSel withTargetMethod:(SEL)altSel forClass:(Class)cls {    
+    if ([self hasSwizzledForTarget:cls swizzleSelector:origSel]) {
         return;
     }
-    [self setHasSwizzled:YES forTarget:obj swizzleSelector:origSel];
+    [self setHasSwizzled:YES forTarget:cls swizzleSelector:origSel];
     
-    Class cls = [obj class];    
     method_exchangeImplementations(class_getInstanceMethod(cls, origSel),
                                    class_getInstanceMethod(cls, altSel));
 }
 
-+ (BOOL)hasSwizzledForTarget:(NSObject *)object swizzleSelector:(SEL)selector {
++ (BOOL)hasSwizzledForTarget:(id)object swizzleSelector:(SEL)selector {
     return [objc_getAssociatedObject(object, selector) boolValue];
 }
 
-+ (void)setHasSwizzled:(BOOL)swizzled forTarget:(NSObject *)object swizzleSelector:(SEL)selector {
++ (void)setHasSwizzled:(BOOL)swizzled forTarget:(id)object swizzleSelector:(SEL)selector {
     objc_setAssociatedObject(object,
                              selector,
                              @(swizzled),

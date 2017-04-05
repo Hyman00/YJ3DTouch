@@ -11,6 +11,6 @@
 
 @interface YJ3DTouchUtil : NSObject
 
-+ (void)safeSwizzleOriginMethod:(SEL)origSel withTargetMethod:(SEL)altSel forObject:(NSObject *)obj;
++ (void)safeSwizzleOriginMethod:(SEL)origSel withTargetMethod:(SEL)altSel forClass:(Class)cls;
 
 @end

@@ -193,18 +193,18 @@
     if (touchConfig.navigation) {
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(pushViewController:animated:)
                               withTargetMethod:@selector(yj3d_private_pushViewController:animated:)
-                                     forObject:touchConfig.navigation];
+                                     forClass:[UINavigationController class]];
     } else if (touchConfig.presentingViewController) {
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(presentViewController:animated:completion:)
                               withTargetMethod:@selector(yj3d_private_presentViewController:animated:completion:)
-                                     forObject:touchConfig.presentingViewController];
+                                     forClass:[UIViewController class]];
     }
     
     if ([view isKindOfClass:[UITableView class]]) {
         UITableView *tableView = (UITableView *)view;
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(tableView:cellForRowAtIndexPath:)
                               withTargetMethod:@selector(yj3d_private_tableView:cellForRowAtIndexPath:)
-                                     forObject:tableView.dataSource];
+                                     forClass:[tableView.dataSource class]];
     } else {
         [self registerForPreviewingWithDelegate:self sourceView:view];
         [view yj3d_private_setHasRegistered3DTouch:YES];
