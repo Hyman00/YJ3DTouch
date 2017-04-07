@@ -1,7 +1,7 @@
 # YJ3DTouch
 YJ3DTouch can easily implement 3D Touch.
 
-![image](https://github.com/Hyman00/YJ3DTouch/blob/master/tip.gif)
+<img src="https://github.com/Hyman00/YJ3DTouch/blob/master/tip.gif" width="320px" height="569px"/>
 
 ## How to use
 
