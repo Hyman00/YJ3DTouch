@@ -119,11 +119,27 @@
 
 @end
 
-#pragma mark - YJ3DTouch_TableView_Delegate
-@interface NSObject (YJ3DTouch_TableView_Delegate)
+#pragma mark - YJ3DTouch_CollectionViewCell
+@interface UICollectionViewCell (YJ3DTouch_CollectionViewCell)
 @end
 
-@implementation NSObject (YJ3DTouch_TableView_Delegate)
+@implementation UICollectionViewCell (YJ3DTouch_CollectionViewCell)
+
+- (UICollectionView *)yj3d_private_cell_CollectionView {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void)yj3d_private_cell_setCollectionView:(UICollectionView *)collectionView {
+    objc_setAssociatedObject(self, @selector(yj3d_private_cell_CollectionView), collectionView, OBJC_ASSOCIATION_ASSIGN);
+}
+
+@end
+
+#pragma mark - YJ3DTouch_ListView_Delegate
+@interface NSObject (YJ3DTouch_ListView_Delegate)
+@end
+
+@implementation NSObject (YJ3DTouch_ListView_Delegate)
 
 - (UITableViewCell *)yj3d_private_tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -136,6 +152,22 @@
         [vc registerForPreviewingWithDelegate:vc sourceView:cell];
         
         [cell yj3d_private_cell_setTableView:tableView];
+    }
+    
+    return cell;
+}
+
+- (UICollectionViewCell *)yj3d_private_collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    UICollectionViewCell *cell = [self yj3d_private_collectionView:collectionView cellForItemAtIndexPath:indexPath];
+    
+    if ([cell yj3d_private_hasRegistered3DTouch] == NO) {
+        [cell yj3d_private_setHasRegistered3DTouch:YES];
+        
+        UIViewController<UIViewControllerPreviewingDelegate> *vc = [collectionView yj3d_private_previewDelegateController];
+        [vc registerForPreviewingWithDelegate:vc sourceView:cell];
+        
+        [cell yj3d_private_cell_setCollectionView:collectionView];
     }
     
     return cell;
@@ -157,29 +189,38 @@
 
 - (void)yj_active3DTouchTable:(UITableView *)tableView forNavigation:(UINavigationController *)navigation
 {
-    if ([self yj3d_private_support3DTouch] == NO) {
-        return;
-    }
-    
-    YJ3DTouchConfig *config = [YJ3DTouchConfig new];
-    config.navigation = navigation;
-    [self yj_active3DTouchView:tableView touchConfig:config];
+    [self yj_active3DTouchView:tableView
+                   clickTarget:nil
+                   clickAction:nil
+                      argument:nil
+                 forNavigation:navigation];
 }
 
-- (void)yj_active3DTouchControl:(UIControl *)control
-                         target:(NSObject *)target
-                         action:(SEL)action
-                  forNavigation:(UINavigationController *)navigation
+- (void)yj_active3DTouchCollectionView:(UICollectionView *)collectionView forNavigation:(UINavigationController *)navigation
 {
-    if ([self yj3d_private_support3DTouch] == NO) {
+    [self yj_active3DTouchView:collectionView
+                   clickTarget:nil
+                   clickAction:nil
+                      argument:nil
+                 forNavigation:navigation];
+}
+
+- (void)yj_active3DTouchView:(UIView *)view
+                 clickTarget:(NSObject *)target
+                 clickAction:(SEL)action
+                    argument:(id)argument
+               forNavigation:(UINavigationController *)navigation
+{
+    if ([self yj3d_private_support3DTouch] == NO || [view yj3d_private_hasRegistered3DTouch]) {
         return;
     }
     
     YJ3DTouchConfig *config = [YJ3DTouchConfig new];
     config.navigation = navigation;
-    config.customActionTarget = target;
-    config.customAction = action;
-    [self yj_active3DTouchView:control touchConfig:config];
+    config.clickActionTarget = target;
+    config.clickAction = action;
+    config.argument = argument;
+    [self yj_active3DTouchView:view touchConfig:config];
 }
 
 - (void)yj_active3DTouchView:(UIView *)view touchConfig:(YJ3DTouchConfig *)touchConfig {
@@ -205,10 +246,16 @@
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(tableView:cellForRowAtIndexPath:)
                               withTargetMethod:@selector(yj3d_private_tableView:cellForRowAtIndexPath:)
                                      forClass:[tableView.dataSource class]];
+    } else if ([view isKindOfClass:[UICollectionView class]]) {
+        UICollectionView *collectionView = (UICollectionView *)view;
+        [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(collectionView:cellForItemAtIndexPath:)
+                              withTargetMethod:@selector(yj3d_private_collectionView:cellForItemAtIndexPath:)
+                                      forClass:[collectionView.dataSource class]];
     } else {
         [self registerForPreviewingWithDelegate:self sourceView:view];
-        [view yj3d_private_setHasRegistered3DTouch:YES];
     }
+    
+    [view yj3d_private_setHasRegistered3DTouch:YES];
 }
 
 // previewController will call this method, eg: detailVC
@@ -222,45 +269,15 @@
 - (UIViewController *)previewingContext:(id <UIViewControllerPreviewing>)previewingContext
               viewControllerForLocation:(CGPoint)location
 {
-    UIViewController *detailVC = nil;
-    
     UIView *sourceView = [previewingContext sourceView];
     
-    YJ3DTouchConfig *config = nil;
-    if ([sourceView isKindOfClass:[UITableViewCell class]]) {
-        UITableViewCell *cell = (UITableViewCell *)sourceView;
-        UITableView *tableView = [cell yj3d_private_cell_tableView];
-        NSIndexPath *indexPath = [tableView indexPathForCell:cell];
-        
-        config = [tableView yj3d_private_3DTouchConfig];
-
-        if (config.navigation) {
-            [config.navigation yj3d_private_setActivePush3DTouch:YES];
-        } else {
-            [config.presentingViewController yj3d_private_setActivePresent3DTouch:YES];
-        }
-        
-        [tableView.delegate tableView:tableView didSelectRowAtIndexPath:indexPath];
-    } else {
-        config = [sourceView yj3d_private_3DTouchConfig];
-
-        if (config.navigation) {
-            [config.navigation yj3d_private_setActivePush3DTouch:YES];
-        } else {
-            [config.presentingViewController yj3d_private_setActivePresent3DTouch:YES];
-        }
-        
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
-        [config.customActionTarget performSelector:config.customAction withObject:sourceView];
-#pragma clang diagnostic pop
-    }
+    YJ3DTouchConfig *config = [self yj3d_private_3DTouchConfigForPreviewSourceView:sourceView extractDetailVC:YES];
     
-    detailVC = [(config.navigation ?: config.presentingViewController) yj3d_private_detailVC];
+    UIViewController *detailVC = [(config.navigation ?: config.presentingViewController) yj3d_private_detailVC];
     
     [(config.navigation ?: config.presentingViewController) yj3d_private_setDetailVC:nil];
-    [detailVC yj3d_private_setCurrentPreviewingView:sourceView];
     
+    [detailVC yj3d_private_setCurrentPreviewingView:sourceView];
     [detailVC yj3d_private_setYJ_previewing3DTouch:YES];
     
     return detailVC;
@@ -271,14 +288,9 @@
 {
     [viewControllerToCommit yj3d_private_setYJ_previewing3DTouch:NO];
     
-    YJ3DTouchConfig *config = nil;
     UIView *sourceView = [previewingContext sourceView];
-    if ([sourceView isKindOfClass:[UITableViewCell class]]) {
-        UITableView *tableView = [(UITableViewCell *)sourceView yj3d_private_cell_tableView];
-        config = [tableView yj3d_private_3DTouchConfig];
-    } else {
-        config = [sourceView yj3d_private_3DTouchConfig];
-    }
+
+    YJ3DTouchConfig *config = [self yj3d_private_3DTouchConfigForPreviewSourceView:sourceView extractDetailVC:NO];
 
     if (config.navigation) {
         [config.navigation pushViewController:viewControllerToCommit animated:YES];
@@ -302,6 +314,66 @@
 
 - (void)yj3d_private_setCurrentPreviewingView:(UIView *)view {
     objc_setAssociatedObject(self, @selector(yj3d_private_currentPreviewingView), view, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (YJ3DTouchConfig *)yj3d_private_3DTouchConfigForPreviewSourceView:(UIView *)sourceView extractDetailVC:(BOOL)extract
+{
+    YJ3DTouchConfig *config = [sourceView yj3d_private_3DTouchConfig];
+    
+    UIView *listView = nil;
+    UIView *listCell = nil;
+    
+    if ([sourceView isKindOfClass:[UITableViewCell class]]) {
+        UITableViewCell *cell = (UITableViewCell *)sourceView;
+        UITableView *tableView = [cell yj3d_private_cell_tableView];
+        if (tableView) {
+            config = [tableView yj3d_private_3DTouchConfig];
+            
+            listView = tableView;
+            listCell = cell;
+        }
+    } else if ([sourceView isKindOfClass:[UICollectionViewCell class]]) {
+        UICollectionViewCell *cell = (UICollectionViewCell *)sourceView;
+        UICollectionView *collectionView = [cell yj3d_private_cell_CollectionView];
+        if (collectionView) {
+            config = [collectionView yj3d_private_3DTouchConfig];
+            
+            listView = collectionView;
+            listCell = cell;
+            
+            if ([collectionView.delegate respondsToSelector:@selector(collectionView:shouldSelectItemAtIndexPath:)] &&
+                [collectionView.delegate collectionView:collectionView shouldSelectItemAtIndexPath:[collectionView indexPathForCell:cell]] == NO)
+            {
+                config = nil;
+                listView = nil;
+                listCell = nil;
+                extract = NO;
+            }
+        }
+    }
+    
+    if (extract) {
+        if (config.navigation) {
+            [config.navigation yj3d_private_setActivePush3DTouch:YES];
+        } else {
+            [config.presentingViewController yj3d_private_setActivePresent3DTouch:YES];
+        }
+        
+        if ([listView isKindOfClass:[UITableView class]]) {
+            UITableView *tableView = (UITableView *)listView;
+            [tableView.delegate tableView:tableView didSelectRowAtIndexPath:[tableView indexPathForCell:(UITableViewCell *)listCell]];
+        } else if ([listView isKindOfClass:[UICollectionView class]]) {
+            UICollectionView *collectionView = (UICollectionView *)listView;
+            [collectionView.delegate collectionView:collectionView didSelectItemAtIndexPath:[collectionView indexPathForCell:(UICollectionViewCell *)listCell]];
+        } else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+            [config.clickActionTarget performSelector:config.clickAction withObject:config.argument];
+#pragma clang diagnostic pop
+        }
+    }
+    
+    return config;
 }
 
 @end

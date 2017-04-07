@@ -10,8 +10,9 @@
 #import "SecondViewController.h"
 #import "UIViewController+YJ3DTouch.h"
 
-@interface ViewController () <UITableViewDelegate, UITableViewDataSource>
+@interface ViewController () <UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate>
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
+@property (nonatomic, weak) IBOutlet UICollectionView *collectionView;
 @property (nonatomic, weak) IBOutlet UIButton *pushButton;
 @property (nonatomic, weak) IBOutlet UIButton *presentButton;
 @property (nonatomic, weak) IBOutlet UIView *customView;
@@ -23,40 +24,44 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cellID"];
+    // pushButton
     [self.pushButton addTarget:self action:@selector(pushButtonTap) forControlEvents:UIControlEventTouchUpInside];
     
+    [self yj_active3DTouchView:self.pushButton
+                   clickTarget:self
+                   clickAction:@selector(pushButtonTap)
+                      argument:nil
+                 forNavigation:self.navigationController];
     
-    [self yj_active3DTouchTable:self.tableView forNavigation:self.navigationController];
-    [self yj_active3DTouchControl:self.pushButton target:self action:@selector(pushButtonTap) forNavigation:self.navigationController];
-
-    
-    [self.presentButton addTarget:self action:@selector(presentButtonTap)
+    // presentButton
+    [self.presentButton addTarget:self
+                           action:@selector(presentButtonTap:)
                  forControlEvents:UIControlEventTouchUpInside];
     
     YJ3DTouchConfig *presentConfig = [YJ3DTouchConfig new];
-    presentConfig.customActionTarget = self;
-    presentConfig.customAction = @selector(presentButtonTap);
+    presentConfig.clickActionTarget = self;
+    presentConfig.clickAction = @selector(presentButtonTap:);
+    presentConfig.argument = self.presentButton;
     presentConfig.presentingViewController = self.navigationController;
     [self yj_active3DTouchView:self.presentButton touchConfig:presentConfig];
     
-    
+    // customView
     UITapGestureRecognizer *tapG = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(customViewTap)];
     [self.customView addGestureRecognizer:tapG];
     
     YJ3DTouchConfig *customConfig = [YJ3DTouchConfig new];
     customConfig.navigation = self.navigationController;
-    customConfig.customActionTarget = self;
-    customConfig.customAction = @selector(customViewTap);
+    customConfig.clickActionTarget = self;
+    customConfig.clickAction = @selector(customViewTap);
     [self yj_active3DTouchView:self.customView touchConfig:customConfig];
 
     
-    
+    // actionItemsBtn
     [self.actionItemsBtn addTarget:self action:@selector(actionItemsBtnTap) forControlEvents:UIControlEventTouchUpInside];
     YJ3DTouchConfig *actionItemConfig = [YJ3DTouchConfig new];
     actionItemConfig.navigation = self.navigationController;
-    actionItemConfig.customActionTarget = self;
-    actionItemConfig.customAction = @selector(actionItemsBtnTap);
+    actionItemConfig.clickActionTarget = self;
+    actionItemConfig.clickAction = @selector(actionItemsBtnTap);
     
     UIPreviewAction *action1 = [UIPreviewAction actionWithTitle:@"action1"
                                                           style:UIPreviewActionStyleDefault
@@ -70,6 +75,16 @@
                                                         }];
     actionItemConfig.previewActionItems = @[action1, action2];
     [self yj_active3DTouchView:self.actionItemsBtn touchConfig:actionItemConfig];
+    
+    
+    // tableView
+    [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cellID"];
+    [self yj_active3DTouchTable:self.tableView forNavigation:self.navigationController];
+    
+    
+    // collectionView
+    [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cellID"];
+    [self yj_active3DTouchCollectionView:self.collectionView forNavigation:self.navigationController];
 }
 
 - (void)customViewTap {
@@ -90,7 +105,7 @@
     [self.navigationController pushViewController:vc animated:YES];
 }
 
-- (void)presentButtonTap {
+- (void)presentButtonTap:(UIButton *)btn {
     SecondViewController *vc = [SecondViewController new];
     vc.detail = @"presentButtonTap";
     [self.navigationController presentViewController:vc animated:YES completion:nil];
@@ -114,6 +129,39 @@
     SecondViewController *vc = [SecondViewController new];
     vc.detail = cell.textLabel.text;
     [self.navigationController pushViewController:vc animated:YES];
+}
+
+#pragma mark - UICollectionViewDelegate
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    return 20;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cellID" forIndexPath:indexPath];
+    cell.contentView.backgroundColor = [self private_randomColor];
+    
+    return cell;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
+    SecondViewController *vc = [SecondViewController new];
+    
+    UICollectionViewCell *cell = [collectionView cellForItemAtIndexPath:indexPath];
+    
+    vc.view.backgroundColor = cell.contentView.backgroundColor;
+    
+    [self.navigationController pushViewController:vc animated:YES];
+}
+
+#pragma mark - Private
+- (UIColor *)private_randomColor {
+    CGFloat hue = arc4random() % 100 / 100.0;
+    CGFloat saturation = (arc4random() % 50 / 100) + 0.5;
+    CGFloat brightness = (arc4random() % 50 / 100) + 0.5;
+    
+    return [UIColor colorWithHue:hue saturation:saturation brightness:brightness alpha:1];
 }
 
 @end

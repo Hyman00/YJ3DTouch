@@ -16,8 +16,9 @@
 @property(nonatomic, weak) UIViewController *presentingViewController;
 
 /// In addition to the UITableView, need to specify the responder
-@property(nonatomic, weak) NSObject *customActionTarget;
-@property(nonatomic, assign) SEL customAction;
+@property(nonatomic, weak) NSObject *clickActionTarget;
+@property(nonatomic, assign) SEL clickAction;
+@property(nonatomic, weak) id argument;
 
 @property(nonatomic, strong) NSArray <id <UIPreviewActionItem>> *previewActionItems;
 
