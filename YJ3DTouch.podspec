@@ -18,7 +18,7 @@ Pod::Spec.new do |s|
   s.source       = { :git => "https://github.com/Hyman00/YJ3DTouch.git", :tag => "#{s.version}" }
 
 
-  s.source_files  = "YJ3DTouch", "YJ3DTouch/**/*.{h,m}"
+  s.source_files  = "YJ3DTouch/YJ3DTouch", "YJ3DTouch/YJ3DTouch/**/*.{h,m}"
   
   s.requires_arc = true
 
