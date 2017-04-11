@@ -6,6 +6,9 @@ YJ3DTouch can easily implement 3D Touch.
 ## How to use
 
 #### First
+```shell
+pod 'YJ3DTouch', '~> 1.1.2'
+```
 ```objective-c
 #import "UIViewController+YJ3DTouch.h"
 ```
