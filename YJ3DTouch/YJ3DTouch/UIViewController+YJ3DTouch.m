@@ -261,7 +261,8 @@
 // previewController will call this method, eg: detailVC
 - (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
     UIView *currentPreviewingView = [self yj3d_private_currentPreviewingView];
-    YJ3DTouchConfig *config = [currentPreviewingView yj3d_private_3DTouchConfig];
+    YJ3DTouchConfig *config = [self yj3d_private_3DTouchConfigForPreviewSourceView:currentPreviewingView extractDetailVC:NO];
+    
     return config.previewActionItems;
 }
 
