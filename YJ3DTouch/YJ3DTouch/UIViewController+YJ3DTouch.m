@@ -179,6 +179,7 @@
 #pragma mark - UIViewController YJ3DTouch
 @implementation UIViewController (YJ3DTouch)
 
+#pragma mark - Getter & Setter
 - (BOOL)yj_previewing3DTouch {
     return [objc_getAssociatedObject(self, _cmd) boolValue];
 }
@@ -187,6 +188,23 @@
     objc_setAssociatedObject(self, @selector(yj_previewing3DTouch), @(previewing), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+- (YJ3DTouchWillPeekBlock)yj_3DTouchPeekBlock {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void)setYj_3DTouchPeekBlock:(YJ3DTouchWillPeekBlock)yj_3DTouchPeekBlock {
+    objc_setAssociatedObject(self, @selector(yj_3DTouchPeekBlock), yj_3DTouchPeekBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+- (YJ3DTouchWillPopBlock)yj_3DTouchPopBlock {
+    return objc_getAssociatedObject(self, _cmd);
+}
+
+- (void)setYj_3DTouchPopBlock:(YJ3DTouchWillPopBlock)yj_3DTouchPopBlock {
+    objc_setAssociatedObject(self, @selector(yj_3DTouchPopBlock), yj_3DTouchPopBlock, OBJC_ASSOCIATION_COPY_NONATOMIC);
+}
+
+#pragma mark - Public
 - (void)yj_active3DTouchTable:(UITableView *)tableView forNavigation:(UINavigationController *)navigation
 {
     [self yj_active3DTouchView:tableView
@@ -272,6 +290,10 @@
 {
     UIView *sourceView = [previewingContext sourceView];
     
+    if (self.yj_3DTouchPeekBlock && self.yj_3DTouchPeekBlock(sourceView) == NO) {
+        return nil;
+    }
+    
     YJ3DTouchConfig *config = [self yj3d_private_3DTouchConfigForPreviewSourceView:sourceView extractDetailVC:YES];
     
     UIViewController *detailVC = [(config.navigation ?: config.presentingViewController) yj3d_private_detailVC];
@@ -290,6 +312,10 @@
     [viewControllerToCommit yj3d_private_setYJ_previewing3DTouch:NO];
     
     UIView *sourceView = [previewingContext sourceView];
+    
+    if (self.yj_3DTouchPopBlock && self.yj_3DTouchPopBlock(sourceView) == NO) {
+        return;
+    }
 
     YJ3DTouchConfig *config = [self yj3d_private_3DTouchConfigForPreviewSourceView:sourceView extractDetailVC:NO];
 

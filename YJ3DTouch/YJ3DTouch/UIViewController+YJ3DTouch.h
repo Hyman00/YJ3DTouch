@@ -9,9 +9,29 @@
 #import <UIKit/UIKit.h>
 #import "YJ3DTouchConfig.h"
 
+/**
+ *  @brief  It will be called when the sourceView will peek.
+ *  If the block return NO, then the 3D Touch will lose efficacy.
+ *
+ *  @param sourceView   A source view, in a previewing view controller’s view hierarchy, responds to a forceful touch by the use
+ */
+typedef BOOL(^YJ3DTouchWillPeekBlock) (UIView *sourceView);
+
+/**
+ *  @brief  It will be called when the sourceView will pop.
+ *  If the block return NO, then the 3D Touch will lose efficacy.
+ *
+ *  @param sourceView   A source view, in a previewing view controller’s view hierarchy, responds to a forceful touch by the use
+ */
+typedef BOOL(^YJ3DTouchWillPopBlock) (UIView *sourceView);
+
+
 @interface UIViewController (YJ3DTouch) <UIViewControllerPreviewingDelegate>
 
 @property (nonatomic, assign, readonly) BOOL yj_previewing3DTouch;
+
+@property (nonatomic, copy) YJ3DTouchWillPeekBlock yj_3DTouchPeekBlock;
+@property (nonatomic, copy) YJ3DTouchWillPopBlock yj_3DTouchPopBlock;
 
 /**
  *  @brief  active 3D Touch for UITableView
