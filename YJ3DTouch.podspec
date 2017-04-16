@@ -2,7 +2,7 @@
 
 Pod::Spec.new do |s|
   s.name         = "YJ3DTouch"
-  s.version      = "1.2.0"
+  s.version      = "1.2.1"
   s.summary      = "Adapt very easily to 3D Touch."
   s.description  = <<-DESC
   YJ3DTouch can easily implement 3D Touch.
