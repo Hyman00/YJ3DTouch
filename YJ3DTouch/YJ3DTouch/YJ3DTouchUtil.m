@@ -7,6 +7,7 @@
 //
 
 #import "YJ3DTouchUtil.h"
+#import <objc/runtime.h>
 
 @implementation YJ3DTouchUtil
 

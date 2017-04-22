@@ -28,7 +28,7 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    if (self.yj_previewing3DTouch) {
+    if (self.yj_3DTouchStatus == YJ3DTouchStatus_Previewing) {
         self.closeButton.hidden = YES;
     } else {
         self.closeButton.hidden = self.presentingViewController == nil;

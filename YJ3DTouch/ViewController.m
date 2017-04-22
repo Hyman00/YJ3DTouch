@@ -85,6 +85,12 @@
     // collectionView
     [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:@"cellID"];
     [self yj_active3DTouchCollectionView:self.collectionView forNavigation:self.navigationController];
+    
+    
+    self.yj_3DTouchTriggerBlock = ^BOOL(YJ3DTouchActionStatus status, UIView *sourceView) {
+        NSLog(@"status: %ld, sourceView: %@", status, sourceView);
+        return YES;
+    };
 }
 
 - (void)customViewTap {

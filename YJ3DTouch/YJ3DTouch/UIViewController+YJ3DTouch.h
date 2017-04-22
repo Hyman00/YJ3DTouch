@@ -9,29 +9,48 @@
 #import <UIKit/UIKit.h>
 #import "YJ3DTouchConfig.h"
 
-/**
- *  @brief  It will be called when the sourceView will peek.
- *  If the block return NO, then the 3D Touch will lose efficacy.
- *
- *  @param sourceView   A source view, in a previewing view controller’s view hierarchy, responds to a forceful touch by the use
- */
-typedef BOOL(^YJ3DTouchWillPeekBlock) (UIView *sourceView);
+typedef NS_ENUM(NSUInteger, YJ3DViewControllerAppear) {
+    YJ3DViewControllerAppear_None = 0,
+    YJ3DViewControllerAppear_WillAppear,
+    YJ3DViewControllerAppear_DidAppear,
+    YJ3DViewControllerAppear_WillDisappear,
+    YJ3DViewControllerAppear_DidDisappear
+};
+
+typedef NS_ENUM(NSUInteger, YJ3DTouchStatus) {
+    YJ3DTouchStatus_None = 0,
+    YJ3DTouchStatus_Prepared,
+    YJ3DTouchStatus_Previewing,
+    YJ3DTouchStatus_Poped
+};
+
+typedef NS_ENUM(NSUInteger, YJ3DTouchActionStatus) {
+    YJ3DTouchActionStatus_None = 0,
+    YJ3DTouchActionStatus_WillPeek,
+    YJ3DTouchActionStatus_DidPeek,
+    YJ3DTouchActionStatus_WillPop,
+    YJ3DTouchActionStatus_DidPop,
+    YJ3DTouchActionStatus_Cancel
+};
 
 /**
- *  @brief  It will be called when the sourceView will pop.
- *  If the block return NO, then the 3D Touch will lose efficacy.
+ *  @brief  It will be called when the sourceView will peek or pop.
+ *  If the block return NO, then the 3D Touch will lose efficacy. 
+    (It only takes effect when status is YJ3DTouchStatus_WillPeek and YJ3DTouchStatus_WillPop)
  *
  *  @param sourceView   A source view, in a previewing view controller’s view hierarchy, responds to a forceful touch by the use
  */
-typedef BOOL(^YJ3DTouchWillPopBlock) (UIView *sourceView);
+typedef BOOL(^YJ3DTouchTriggerBlock) (YJ3DTouchActionStatus status, UIView *sourceView);
 
 
 @interface UIViewController (YJ3DTouch) <UIViewControllerPreviewingDelegate>
 
-@property (nonatomic, assign, readonly) BOOL yj_previewing3DTouch;
+@property (nonatomic, assign, readonly) YJ3DViewControllerAppear yj_appearStatus;
 
-@property (nonatomic, copy) YJ3DTouchWillPeekBlock yj_3DTouchPeekBlock;
-@property (nonatomic, copy) YJ3DTouchWillPopBlock yj_3DTouchPopBlock;
+@property (nonatomic, assign, readonly) YJ3DTouchStatus yj_3DTouchStatus;
+
+@property (nonatomic, assign, readonly) YJ3DTouchActionStatus yj_3DTouchActionStatus;
+@property (nonatomic, copy) YJ3DTouchTriggerBlock yj_3DTouchTriggerBlock;
 
 /**
  *  @brief  active 3D Touch for UITableView
