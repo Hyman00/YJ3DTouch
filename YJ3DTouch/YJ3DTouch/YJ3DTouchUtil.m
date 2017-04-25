@@ -32,4 +32,34 @@
                              OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
+// 当前类是否覆写了指定接口
++ (BOOL)isClass:(Class)cls overwriteSelector:(SEL)selector
+{
+    Class superClass = [cls superclass];
+    if ([cls instanceMethodForSelector:selector] != [superClass instanceMethodForSelector:selector]) {
+        return YES;
+    }
+    return NO;
+}
+
++ (void)dynamicProcessClass:(Class)cls oriSel:(SEL)oriSel altSel:(SEL)altSel oriImp:(IMP)oriImp altImp:(IMP)altImp
+{
+    if ([YJ3DTouchUtil hasSwizzledForTarget:cls swizzleSelector:oriSel]) {
+        return;
+    }
+    
+    if ([self isClass:cls overwriteSelector:oriSel]) {   // 重载了该接口
+        if (class_addMethod(cls, altSel, altImp, "@@:@@")) {
+            [self setHasSwizzled:YES forTarget:cls swizzleSelector:oriSel];
+            method_exchangeImplementations(class_getInstanceMethod(cls, oriSel),
+                                           class_getInstanceMethod(cls, altSel));
+        }
+    }
+    else {
+        if (class_addMethod(cls, oriSel, oriImp, "@@:@@")) {
+            [YJ3DTouchUtil setHasSwizzled:YES forTarget:cls swizzleSelector:oriSel];
+        }
+    }
+}
+
 @end
