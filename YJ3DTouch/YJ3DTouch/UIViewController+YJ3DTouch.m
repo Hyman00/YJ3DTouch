@@ -314,7 +314,7 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
     }
     
     [view yj3d_private_set3DTouchConfig:touchConfig];
-
+    
     if ([view yj3d_private_hasRegistered3DTouch]) {
         return;
     }
@@ -324,18 +324,18 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
     if (touchConfig.navigation) {
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(pushViewController:animated:)
                               withTargetMethod:@selector(yj3d_private_pushViewController:animated:)
-                                     forClass:[UINavigationController class]];
+                                      forClass:[UINavigationController class]];
     } else if (touchConfig.presentingViewController) {
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(presentViewController:animated:completion:)
                               withTargetMethod:@selector(yj3d_private_presentViewController:animated:completion:)
-                                     forClass:[UIViewController class]];
+                                      forClass:[UIViewController class]];
     }
     
     if ([view isKindOfClass:[UITableView class]]) {
         UITableView *tableView = (UITableView *)view;
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(tableView:cellForRowAtIndexPath:)
                               withTargetMethod:@selector(yj3d_private_tableView:cellForRowAtIndexPath:)
-                                     forClass:[tableView.dataSource class]];
+                                      forClass:[tableView.dataSource class]];
     } else if ([view isKindOfClass:[UICollectionView class]]) {
         UICollectionView *collectionView = (UICollectionView *)view;
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(collectionView:cellForItemAtIndexPath:)
@@ -414,9 +414,9 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
     
     self.yj_3DTouchActionStatus = YJ3DTouchActionStatus_DidPop;
     viewControllerToCommit.yj_3DTouchStatus = YJ3DTouchStatus_Poped;
-
+    
     YJ3DTouchConfig *config = [self yj3d_private_3DTouchConfigForPreviewSourceView:sourceView extractDetailVC:NO];
-
+    
     if (config.navigation) {
         [config.navigation pushViewController:viewControllerToCommit animated:YES];
     } else {
@@ -589,6 +589,8 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
     if (self.yj_3DTouchStatus == YJ3DTouchStatus_Previewing) {
         [hostVC performSelector:@selector(yj3d_private_delaySetCancelActionStatus) withObject:nil afterDelay:0.2];
     }
+    
+    self.yj_3DTouchStatus = YJ3DTouchStatus_None;
 }
 
 - (void)yj3d_private_delaySetCancelActionStatus {
