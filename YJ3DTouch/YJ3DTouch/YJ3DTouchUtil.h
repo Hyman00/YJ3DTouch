@@ -12,4 +12,6 @@
 
 + (void)safeSwizzleOriginMethod:(SEL)origSel withTargetMethod:(SEL)altSel forClass:(Class)cls;
 
++ (void)dynamicProcessClass:(Class)cls oriSel:(SEL)oriSel altSel:(SEL)altSel oriImp:(IMP)oriImp altImp:(IMP)altImp;
+
 @end
