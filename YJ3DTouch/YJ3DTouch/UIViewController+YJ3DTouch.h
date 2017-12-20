@@ -33,6 +33,10 @@ typedef NS_ENUM(NSUInteger, YJ3DTouchActionStatus) {
     YJ3DTouchActionStatus_Cancel
 };
 
+extern NSString * const YJ3DTouchActionNotification;
+extern NSString * const YJ3DTouchActionUserInfoPageKey;
+extern NSString * const YJ3DTouchActionUserInfoStatusKey;
+
 /**
  *  @brief  It will be called when the sourceView will peek or pop.
  *  If the block return NO, then the 3D Touch will lose efficacy. 

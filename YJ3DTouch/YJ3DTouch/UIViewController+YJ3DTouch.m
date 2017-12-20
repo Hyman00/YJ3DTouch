@@ -17,27 +17,27 @@
 @implementation UIViewController (YJ3DTouch_VC)
 
 - (UIViewController *)yj3d_private_detailVC {
-    return objc_getAssociatedObject(self, _cmd);
+    return [YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self];
 }
 
 - (void)yj3d_private_setDetailVC:(UIViewController *)detailVC {
-    objc_setAssociatedObject(self, @selector(yj3d_private_detailVC), detailVC, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [YJ3DTouchUtil setAssociatedObject:detailVC withKey:@selector(yj3d_private_detailVC) policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC forTarget:self];
 }
 
 - (UIViewController *)yj3d_private_hostVC {
-    return objc_getAssociatedObject(self, _cmd);
+    return [YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self];
 }
 
 - (void)yj3d_private_setHostVC:(UIViewController *)hostVC {
-    objc_setAssociatedObject(self, @selector(yj3d_private_hostVC), hostVC, OBJC_ASSOCIATION_ASSIGN);
+    [YJ3DTouchUtil setAssociatedObject:hostVC withKey:@selector(yj3d_private_hostVC) policy:OBJC_ASSOCIATION_ASSIGN forTarget:self];
 }
 
 - (BOOL)yj3d_private_activePresent3DTouch {
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
+    return [[YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self] boolValue];
 }
 
 - (void)yj3d_private_setActivePresent3DTouch:(BOOL)active {
-    objc_setAssociatedObject(self, @selector(yj3d_private_activePresent3DTouch), @(active), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [YJ3DTouchUtil setAssociatedObject:@(active) withKey:@selector(yj3d_private_activePresent3DTouch) policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC forTarget:self];
 }
 
 - (void)yj3d_private_presentViewController:(UIViewController *)viewControllerToPresent animated:(BOOL)flag completion:(void (^)(void))completion
@@ -66,15 +66,21 @@
         return;
     }
     
+    // Handle the problem of pushing the same viewController repeatedly
+    if (viewController.yj_3DTouchStatus != YJ3DTouchStatus_None
+        && viewController.yj_3DTouchStatus != YJ3DTouchStatus_Poped) {
+        return;
+    }
+    
     [self yj3d_private_pushViewController:viewController animated:animated];
 }
 
 - (BOOL)yj3d_private_activePush3DTouch {
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
+    return [[YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self] boolValue];
 }
 
 - (void)yj3d_private_setActivePush3DTouch:(BOOL)active {
-    objc_setAssociatedObject(self, @selector(yj3d_private_activePush3DTouch), @(active), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [YJ3DTouchUtil setAssociatedObject:@(active) withKey:@selector(yj3d_private_activePush3DTouch) policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC forTarget:self];
 }
 
 @end
@@ -86,27 +92,27 @@
 @implementation UIView (YJ3DTouch_View)
 
 - (UIViewController<UIViewControllerPreviewingDelegate> *)yj3d_private_previewDelegateController {
-    return objc_getAssociatedObject(self, _cmd);
+    return [YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self];
 }
 
 - (void)yj3d_private_setPreviewDelegateController:(UIViewController *)viewController {
-    objc_setAssociatedObject(self, @selector(yj3d_private_previewDelegateController), viewController, OBJC_ASSOCIATION_ASSIGN);
+    [YJ3DTouchUtil setAssociatedObject:viewController withKey:@selector(yj3d_private_previewDelegateController) policy:OBJC_ASSOCIATION_ASSIGN forTarget:self];
 }
 
 - (YJ3DTouchConfig *)yj3d_private_3DTouchConfig {
-    return objc_getAssociatedObject(self, _cmd);
+    return [YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self];
 }
 
 - (void)yj3d_private_set3DTouchConfig:(YJ3DTouchConfig *)config {
-    objc_setAssociatedObject(self, @selector(yj3d_private_3DTouchConfig), config, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [YJ3DTouchUtil setAssociatedObject:config withKey:@selector(yj3d_private_3DTouchConfig) policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC forTarget:self];
 }
 
 - (BOOL)yj3d_private_hasRegistered3DTouch {
-    return [objc_getAssociatedObject(self, _cmd) boolValue];
+    return [[YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self] boolValue];
 }
 
 - (void)yj3d_private_setHasRegistered3DTouch:(BOOL)registered {
-    objc_setAssociatedObject(self, @selector(yj3d_private_hasRegistered3DTouch), @(registered), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    [YJ3DTouchUtil setAssociatedObject:@(registered) withKey:@selector(yj3d_private_hasRegistered3DTouch) policy:OBJC_ASSOCIATION_RETAIN_NONATOMIC forTarget:self];
 }
 
 @end
@@ -118,11 +124,11 @@
 @implementation UITableViewCell (YJ3DTouch_Cell)
 
 - (UITableView *)yj3d_private_cell_tableView {
-    return objc_getAssociatedObject(self, _cmd);
+    return [YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self];
 }
 
 - (void)yj3d_private_cell_setTableView:(UITableView *)tableView {
-    objc_setAssociatedObject(self, @selector(yj3d_private_cell_tableView), tableView, OBJC_ASSOCIATION_ASSIGN);
+    [YJ3DTouchUtil setAssociatedObject:tableView withKey:@selector(yj3d_private_cell_tableView) policy:OBJC_ASSOCIATION_ASSIGN forTarget:self];
 }
 
 @end
@@ -134,57 +140,19 @@
 @implementation UICollectionViewCell (YJ3DTouch_CollectionViewCell)
 
 - (UICollectionView *)yj3d_private_cell_CollectionView {
-    return objc_getAssociatedObject(self, _cmd);
+    return [YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self];
 }
 
 - (void)yj3d_private_cell_setCollectionView:(UICollectionView *)collectionView {
-    objc_setAssociatedObject(self, @selector(yj3d_private_cell_CollectionView), collectionView, OBJC_ASSOCIATION_ASSIGN);
+    [YJ3DTouchUtil setAssociatedObject:collectionView withKey:@selector(yj3d_private_cell_CollectionView) policy:OBJC_ASSOCIATION_ASSIGN forTarget:self];
 }
 
 @end
-
-#pragma mark - YJ3DTouch_ListView_Delegate
-@interface NSObject (YJ3DTouch_ListView_Delegate)
-@end
-
-@implementation NSObject (YJ3DTouch_ListView_Delegate)
-
-- (UITableViewCell *)yj3d_private_tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell *cell = [self yj3d_private_tableView:tableView cellForRowAtIndexPath:indexPath];
-    
-    if ([cell yj3d_private_hasRegistered3DTouch] == NO) {
-        [cell yj3d_private_setHasRegistered3DTouch:YES];
-        
-        UIViewController<UIViewControllerPreviewingDelegate> *vc = [tableView yj3d_private_previewDelegateController];
-        [vc registerForPreviewingWithDelegate:vc sourceView:cell];
-        
-        [cell yj3d_private_cell_setTableView:tableView];
-    }
-    
-    return cell;
-}
-
-- (UICollectionViewCell *)yj3d_private_collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-    UICollectionViewCell *cell = [self yj3d_private_collectionView:collectionView cellForItemAtIndexPath:indexPath];
-    
-    if ([cell yj3d_private_hasRegistered3DTouch] == NO) {
-        [cell yj3d_private_setHasRegistered3DTouch:YES];
-        
-        UIViewController<UIViewControllerPreviewingDelegate> *vc = [collectionView yj3d_private_previewDelegateController];
-        [vc registerForPreviewingWithDelegate:vc sourceView:cell];
-        
-        [cell yj3d_private_cell_setCollectionView:collectionView];
-    }
-    
-    return cell;
-}
-
-@end
-
 
 static BOOL kYJ3DTouch_VC_Prepared = NO;
+NSString * const YJ3DTouchActionNotification = @"YJ3DTouchActionNotification";
+NSString * const YJ3DTouchActionUserInfoPageKey = @"actionPage";
+NSString * const YJ3DTouchActionUserInfoStatusKey = @"actionStatus";
 
 #pragma mark - UIViewController YJ3DTouch
 @implementation UIViewController (YJ3DTouch)
@@ -256,6 +224,11 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
         default:
             break;
     }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:YJ3DTouchActionNotification
+                                                        object:nil
+                                                      userInfo:@{YJ3DTouchActionUserInfoPageKey: self,
+                                                                 YJ3DTouchActionUserInfoStatusKey: @(yj_3DTouchActionStatus)}];
 }
 
 #pragma mark - Public
@@ -314,7 +287,7 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
     }
     
     [view yj3d_private_set3DTouchConfig:touchConfig];
-    
+
     if ([view yj3d_private_hasRegistered3DTouch]) {
         return;
     }
@@ -324,23 +297,17 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
     if (touchConfig.navigation) {
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(pushViewController:animated:)
                               withTargetMethod:@selector(yj3d_private_pushViewController:animated:)
-                                      forClass:[UINavigationController class]];
+                                     forClass:[UINavigationController class]];
     } else if (touchConfig.presentingViewController) {
         [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(presentViewController:animated:completion:)
                               withTargetMethod:@selector(yj3d_private_presentViewController:animated:completion:)
-                                      forClass:[UIViewController class]];
+                                     forClass:[UIViewController class]];
     }
     
     if ([view isKindOfClass:[UITableView class]]) {
-        UITableView *tableView = (UITableView *)view;
-        [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(tableView:cellForRowAtIndexPath:)
-                              withTargetMethod:@selector(yj3d_private_tableView:cellForRowAtIndexPath:)
-                                      forClass:[tableView.dataSource class]];
+        [self yj3d_private_active3DTouchForTableView:(UITableView *)view];
     } else if ([view isKindOfClass:[UICollectionView class]]) {
-        UICollectionView *collectionView = (UICollectionView *)view;
-        [YJ3DTouchUtil safeSwizzleOriginMethod:@selector(collectionView:cellForItemAtIndexPath:)
-                              withTargetMethod:@selector(yj3d_private_collectionView:cellForItemAtIndexPath:)
-                                      forClass:[collectionView.dataSource class]];
+        [self yj3d_private_active3DTouchForCollectionView:(UICollectionView *)view];
     } else {
         [self registerForPreviewingWithDelegate:self sourceView:view];
     }
@@ -372,6 +339,7 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
     // trigger will peek
     self.yj_3DTouchActionStatus = YJ3DTouchActionStatus_WillPeek;
     if ([self yj3d_private_3DTouchActionCanContinue] == NO) {
+        self.yj_3DTouchActionStatus = YJ3DTouchActionStatus_Cancel;
         return nil;
     }
     
@@ -380,10 +348,12 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
     kYJ3DTouch_VC_Prepared = NO;
     
     UIViewController *detailVC = [(config.navigation ?: config.presentingViewController) yj3d_private_detailVC];
-    
+
     if (detailVC) {
         detailVC.yj_3DTouchStatus = YJ3DTouchStatus_Previewing;
         [detailVC yj3d_private_setHostVC:self];
+    } else {
+        self.yj_3DTouchActionStatus = YJ3DTouchActionStatus_Cancel;
     }
     
     if (config.navigation) {
@@ -409,14 +379,15 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
     // trigger will pop
     self.yj_3DTouchActionStatus = YJ3DTouchActionStatus_WillPop;
     if ([self yj3d_private_3DTouchActionCanContinue] == NO) {
+        self.yj_3DTouchActionStatus = YJ3DTouchActionStatus_Cancel;
         return;
     }
     
     self.yj_3DTouchActionStatus = YJ3DTouchActionStatus_DidPop;
     viewControllerToCommit.yj_3DTouchStatus = YJ3DTouchStatus_Poped;
-    
+
     YJ3DTouchConfig *config = [self yj3d_private_3DTouchConfigForPreviewSourceView:sourceView extractDetailVC:NO];
-    
+
     if (config.navigation) {
         [config.navigation pushViewController:viewControllerToCommit animated:YES];
     } else {
@@ -452,11 +423,14 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
 }
 
 - (BOOL)yj3d_private_support3DTouch {
-    if ([[[UIDevice currentDevice] systemVersion] compare:@"9.0" options:NSNumericSearch] == NSOrderedAscending) {
-        return NO;
+    UIWindow *keyWindow = [UIApplication sharedApplication].keyWindow;
+    if ([keyWindow respondsToSelector:@selector(traitCollection)]
+        && [keyWindow.traitCollection respondsToSelector:@selector(forceTouchCapability)])
+    {
+        return keyWindow.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable;
     }
     
-    return [UIApplication sharedApplication].keyWindow.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable;
+    return NO;
 }
 
 - (BOOL)yj3d_private_3DTouchActionCanContinue {
@@ -468,15 +442,15 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
 }
 
 - (UIView *)yj3d_private_currentPreviewingView {
-    return objc_getAssociatedObject(self, _cmd);
+    return [YJ3DTouchUtil associatedObjectWithkey:_cmd forTarget:self];
 }
 
 - (void)yj3d_private_setCurrentPreviewingView:(UIView *)view {
-    objc_setAssociatedObject(self, @selector(yj3d_private_currentPreviewingView), view, OBJC_ASSOCIATION_ASSIGN);
+    [YJ3DTouchUtil setAssociatedObject:view withKey:@selector(yj3d_private_currentPreviewingView) policy:OBJC_ASSOCIATION_ASSIGN forTarget:self];
 }
 
-- (YJ3DTouchConfig *)yj3d_private_3DTouchConfigForPreviewSourceView:(UIView *)sourceView extractDetailVC:(BOOL)extract
-{
+- (YJ3DTouchConfig *)yj3d_private_3DTouchConfigForPreviewSourceView:(UIView *)sourceView
+                                                    extractDetailVC:(BOOL)extract {
     YJ3DTouchConfig *config = [sourceView yj3d_private_3DTouchConfig];
     
     UIView *listView = nil;
@@ -500,9 +474,8 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
             listView = collectionView;
             listCell = cell;
             
-            if ([collectionView.delegate respondsToSelector:@selector(collectionView:shouldSelectItemAtIndexPath:)] &&
-                [collectionView.delegate collectionView:collectionView shouldSelectItemAtIndexPath:[collectionView indexPathForCell:cell]] == NO)
-            {
+            BOOL notSupportSelect = [collectionView.delegate respondsToSelector:@selector(collectionView:shouldSelectItemAtIndexPath:)] && ([collectionView.delegate collectionView:collectionView shouldSelectItemAtIndexPath:[collectionView indexPathForCell:cell]] == NO);
+            if ([collectionView.delegate respondsToSelector:@selector(collectionView:shouldSelectItemAtIndexPath:)] && notSupportSelect) {
                 config = nil;
                 listView = nil;
                 listCell = nil;
@@ -518,23 +491,20 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
             [config.presentingViewController yj3d_private_setActivePresent3DTouch:YES];
         }
         
-        if ([listView isKindOfClass:[UITableView class]])
-        {
+        if ([listView isKindOfClass:[UITableView class]]) {
             UITableView *tableView = (UITableView *)listView;
-            [tableView.delegate tableView:tableView didSelectRowAtIndexPath:[tableView indexPathForCell:(UITableViewCell *)listCell]];
-        }
-        else if ([listView isKindOfClass:[UICollectionView class]])
-        {
+            [tableView.delegate tableView:tableView
+                  didSelectRowAtIndexPath:[tableView indexPathForCell:(UITableViewCell *)listCell]];
+        } else if ([listView isKindOfClass:[UICollectionView class]]) {
             UICollectionView *collectionView = (UICollectionView *)listView;
             
-            if ([collectionView.delegate respondsToSelector:@selector(collectionView:shouldSelectItemAtIndexPath:)] &&
-                [collectionView.delegate collectionView:collectionView shouldSelectItemAtIndexPath:[collectionView indexPathForCell:(UICollectionViewCell *)listCell]])
-            {
+            BOOL notSupportSelect = [collectionView.delegate respondsToSelector:@selector(collectionView:shouldSelectItemAtIndexPath:)] && ([collectionView.delegate collectionView:collectionView shouldSelectItemAtIndexPath:[collectionView indexPathForCell:(UICollectionViewCell *)listCell]] == NO);
+            BOOL canResponds = [collectionView.delegate respondsToSelector:@selector(collectionView:didSelectItemAtIndexPath:)];
+            
+            if (!notSupportSelect && canResponds) {
                 [collectionView.delegate collectionView:collectionView didSelectItemAtIndexPath:[collectionView indexPathForCell:(UICollectionViewCell *)listCell]];
             }
-        }
-        else
-        {
+        } else {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
             [config.clickActionTarget performSelector:config.clickAction withObject:config.argument];
@@ -599,6 +569,58 @@ static BOOL kYJ3DTouch_VC_Prepared = NO;
 
 - (void)yj3d_private_cancelDelaySetCancelActionStatus {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(yj3d_private_delaySetCancelActionStatus) object:nil];
+}
+
+- (void)yj3d_private_active3DTouchForTableView:(UITableView *)tableView {
+    [YJ3DTouchUtil hookTableViewDataSource:tableView.dataSource withBlock:^(UITableViewCell *cell, UITableView *tableView) {
+        if ([cell yj3d_private_hasRegistered3DTouch]) {
+            return;
+        }
+        
+        UIViewController *vc = [tableView yj3d_private_previewDelegateController];
+        if (vc) {
+            [cell yj3d_private_setHasRegistered3DTouch:YES];
+            [cell yj3d_private_cell_setTableView:tableView];
+            [vc registerForPreviewingWithDelegate:vc sourceView:cell];
+        }
+    }];
+    
+    for (UITableViewCell *cell in tableView.visibleCells) {
+        if ([cell yj3d_private_hasRegistered3DTouch]) {
+            continue;
+        }
+        
+        [cell yj3d_private_setHasRegistered3DTouch:YES];
+        UIViewController *vc = [tableView yj3d_private_previewDelegateController];
+        [vc registerForPreviewingWithDelegate:vc sourceView:cell];
+        [cell yj3d_private_cell_setTableView:tableView];
+    }
+}
+
+- (void)yj3d_private_active3DTouchForCollectionView:(UICollectionView *)collectionView {
+    [YJ3DTouchUtil hookCollectionViewDataSource:collectionView.dataSource withBlock:^(UICollectionViewCell *cell, UICollectionView *collectionView) {
+        if ([cell yj3d_private_hasRegistered3DTouch]) {
+            return;
+        }
+        
+        UIViewController *vc = [collectionView yj3d_private_previewDelegateController];
+        if (vc) {
+            [vc registerForPreviewingWithDelegate:vc sourceView:cell];
+            [cell yj3d_private_setHasRegistered3DTouch:YES];
+            [cell yj3d_private_cell_setCollectionView:collectionView];
+        }
+    }];
+    
+    for (UICollectionViewCell *cell in collectionView.visibleCells) {
+        if ([cell yj3d_private_hasRegistered3DTouch]) {
+            continue;
+        }
+        
+        [cell yj3d_private_setHasRegistered3DTouch:YES];
+        UIViewController *vc = [collectionView yj3d_private_previewDelegateController];
+        [vc registerForPreviewingWithDelegate:vc sourceView:cell];
+        [cell yj3d_private_cell_setCollectionView:collectionView];
+    }
 }
 
 @end
